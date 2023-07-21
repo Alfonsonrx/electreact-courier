@@ -1,9 +1,39 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu } = require('electron');
+
+const template = [
+  // { role: 'appMenu' }
+  ...([]),
+  // { role: 'fileMenu' }
+  {
+    label: 'Mantenedores',
+    submenu: [
+      { role: 'quit' }
+    ]
+  },
+  // { role: 'editMenu' }
+  {
+    label: 'Consultas',
+    submenu: [
+      { role: 'undo' },
+      { role: 'redo' }
+    ]
+  },
+  // { role: 'viewMenu' }
+  {
+    label: 'Informes',
+    submenu: [
+      { role: 'reload' },
+      { role: 'forceReload' }
+    ]
+  },
+]
 
 const path = require('path')
 const isDev = require('electron-is-dev')
 
 require('@electron/remote/main').initialize()
+
+const menu = Menu.buildFromTemplate(template);
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -16,6 +46,8 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js')
     }
   })
+
+  // win.setMenu(menu);
 
   win.loadURL(
     isDev
@@ -47,9 +79,10 @@ ipcMain.on('notify', (_, message) => {
       worldSafeExecuteJavaScript: true,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
-      
+
     }
   })
+  win.removeMenu()
   win.loadURL(
     isDev
       ? 'http://localhost:3000/settings'
